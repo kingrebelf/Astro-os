@@ -1,0 +1,50 @@
+/* astro-os-managed: ASTRO//OS look for the Firefox window itself */
+:root {
+  --astro-g: #00ff8c; --astro-c: #00e5ff; --astro-bg: #010705; --astro-dim: #0b4d33;
+  --toolbar-bgcolor: #03120b !important; --toolbar-color: #9dffd0 !important;
+  --lwt-accent-color: #010705 !important; --lwt-accent-color-inactive: #010705 !important;
+  --lwt-text-color: #9dffd0 !important;
+  --tab-selected-bgcolor: #00331f !important; --tab-selected-textcolor: #dcfff0 !important;
+  --toolbar-field-background-color: #000000 !important; --toolbar-field-color: #00ff8c !important;
+  --toolbar-field-border-color: #0b4d33 !important;
+  --toolbar-field-focus-background-color: #000000 !important; --toolbar-field-focus-color: #dcfff0 !important;
+  --toolbar-field-focus-border-color: #00ff8c !important;
+  --focus-outline-color: #00ff8c !important;
+  --arrowpanel-background: #010905 !important; --arrowpanel-color: #9dffd0 !important;
+  --arrowpanel-border-color: #00ff8c !important;
+  --panel-background: #010905 !important; --panel-color: #9dffd0 !important; --panel-border-color: #00ff8c !important;
+  --urlbarView-highlight-background: #00472a !important; --urlbarView-highlight-color: #dcfff0 !important;
+  --urlbar-box-bgcolor: #021a10 !important;
+  --tabs-navbar-separator-color: #00ff8c !important; --chrome-content-separator-color: #00ff8c !important;
+  --sidebar-background-color: #010905 !important; --sidebar-text-color: #9dffd0 !important;
+  --toolbarbutton-icon-fill: #00ff8c !important; --toolbarbutton-hover-background: #00331f !important;
+  --toolbarbutton-active-background: #00472a !important;
+  --button-background-color-primary: #00ff8c !important; --button-text-color-primary: #000000 !important;
+  --color-accent-primary: #00ff8c !important; --link-color: #00e5ff !important;
+  --tab-border-radius: 0px !important; --toolbarbutton-border-radius: 0px !important;
+  --arrowpanel-border-radius: 0px !important; --border-radius-small: 0px !important; --border-radius-medium: 0px !important;
+}
+#navigator-toolbox, #navigator-toolbox *, #sidebar-box, menupopup, panel, #statuspanel-label {
+  font-family: "Ubuntu Mono", monospace !important;
+}
+#navigator-toolbox { background: #010705 !important; border-bottom: 1px solid var(--astro-g) !important; }
+#TabsToolbar, #titlebar { background: #010705 !important; }
+#nav-bar, #PersonalToolbar { background: #03120b !important; }
+.tab-background { border-radius: 0 !important; border: 1px solid transparent !important; }
+.tabbrowser-tab[selected] .tab-background, .tab-background:is([selected], [multiselected]) {
+  background: linear-gradient(#00472a, #021a10) !important; border: 1px solid var(--astro-g) !important;
+  box-shadow: 0 0 9px #00ff8c88 !important; outline: none !important;
+}
+.tabbrowser-tab:not([selected]) .tab-label { color: #2f8a62 !important; }
+.tabbrowser-tab:not([selected]):hover .tab-background { background: #00331f !important; border-color: var(--astro-dim) !important; }
+.tab-label { text-transform: uppercase; letter-spacing: 1px; }
+#urlbar-background, .urlbar-background, #searchbar { border-radius: 0 !important; border: 1px solid var(--astro-dim) !important; background: #000 !important; }
+#urlbar[focused] > #urlbar-background, #urlbar[focused] .urlbar-background { border-color: var(--astro-g) !important; box-shadow: 0 0 10px #00ff8c66 !important; }
+#urlbar-input, .urlbar-input { color: var(--astro-g) !important; caret-color: #dcfff0 !important; }
+.urlbarView-row[selected] .urlbarView-row-inner { background: #00472a !important; }
+.urlbarView-url { color: var(--astro-c) !important; }
+menupopup, panel { --panel-border-radius: 0px !important; }
+menu:hover, menuitem:hover, menu[_moz-menuactive], menuitem[_moz-menuactive] { background: var(--astro-g) !important; color: #000 !important; }
+toolbarbutton, .toolbarbutton-1 { border-radius: 0 !important; }
+#statuspanel-label { background: #010905 !important; color: var(--astro-g) !important; border: 1px solid var(--astro-g) !important; border-radius: 0 !important; }
+findbar { background: #010705 !important; color: #9dffd0 !important; border-top: 1px solid var(--astro-g) !important; }

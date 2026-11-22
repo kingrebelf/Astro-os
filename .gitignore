@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# DB-IP Lite databases: too large for git, fetched by install.sh
+data/*.mmdb
