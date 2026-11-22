@@ -185,3 +185,7 @@ The packages the installer added are left in place.
 
 - IP geolocation by [DB-IP](https://db-ip.com) (IP to City Lite and IP to ASN Lite, CC BY 4.0). The databases are downloaded by the installer, not stored in this repository.
 - Coastlines from [Natural Earth](https://www.naturalearthdata.com) (public domain).
+
+## Licence
+
+[MIT](LICENSE). Provided as is, with no warranty or support.
