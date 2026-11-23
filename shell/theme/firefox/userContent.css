@@ -1,0 +1,29 @@
+/* astro-os-managed: ASTRO//OS look for Firefox's own pages + scrollbars everywhere */
+:root { scrollbar-color: #0b6b45 #010705 !important; }
+@-moz-document url-prefix("about:") {
+  :root {
+    --newtab-background-color: #010705 !important; --newtab-background-color-secondary: #03120b !important;
+    --newtab-text-primary-color: #9dffd0 !important; --newtab-primary-action-background: #00ff8c !important;
+    --newtab-wordmark-color: #00ff8c !important; --newtab-search-icon-color: #00ff8c !important;
+    --in-content-page-background: #010705 !important; --in-content-page-color: #9dffd0 !important;
+    --in-content-box-background: #03120b !important; --in-content-box-border-color: #0b4d33 !important;
+    --in-content-primary-button-background: #00ff8c !important; --in-content-primary-button-text-color: #000 !important;
+    --in-content-link-color: #00e5ff !important; --in-content-accent-color: #00ff8c !important;
+    --color-accent-primary: #00ff8c !important; --background-color-canvas: #010705 !important;
+    --background-color-box: #03120b !important; --text-color: #9dffd0 !important; --border-color: #0b4d33 !important;
+    --link-color: #00e5ff !important; --border-radius-small: 0 !important; --border-radius-medium: 0 !important;
+  }
+  html, body { background-color: #010705 !important; color: #9dffd0 !important; font-family: "Ubuntu Mono", monospace !important; }
+  ::selection { background: #00ff8c !important; color: #000 !important; }
+}
+@-moz-document url-prefix("about:home"), url-prefix("about:newtab"), url-prefix("about:privatebrowsing") {
+  body { background-image:
+           linear-gradient(#00ff8c0d 1px, transparent 1px), linear-gradient(90deg, #00ff8c0d 1px, transparent 1px) !important;
+         background-size: 32px 32px !important; }
+  .search-wrapper .search-handoff-button, .search-wrapper input, .fake-editable, .search-inner-wrapper {
+    background: #000 !important; border: 1px solid #00ff8c !important; border-radius: 0 !important;
+    color: #00ff8c !important; box-shadow: 0 0 14px #00ff8c55 !important; }
+  .top-site-outer .tile, .card-outer, .ds-card { background: #03120b !important; border: 1px solid #0b4d33 !important; border-radius: 0 !important; box-shadow: none !important; }
+  .top-site-outer:hover .tile { border-color: #00ff8c !important; box-shadow: 0 0 10px #00ff8c77 !important; }
+  .logo-and-wordmark .wordmark, .logo-and-wordmark .logo { filter: hue-rotate(95deg) saturate(3) !important; }
+}

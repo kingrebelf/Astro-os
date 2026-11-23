@@ -1,0 +1,5 @@
+#!/bin/bash
+# The OPENCODE button: one click opens OpenCode, and installs it first if it is missing.
+cd "$HOME" || exit 1
+exec alacritty --config-file /opt/astro-os/term/alacritty.toml --title "ASTRO//CODE" \
+     -o 'window.dimensions={columns=120,lines=34}' -e /usr/local/lib/astro-os/opencode-term "$@"

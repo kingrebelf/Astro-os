@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""The WISPR FLOW button.
+
+If Wispr Flow is installed, start it. If it is not, look for a Linux build and
+install it with one click. Wispr has not published a Linux build yet, so until
+they do this says so plainly instead of pretending.
+
+Settings: /etc/astro-os/flow.conf (URL = where to look for the Linux build).
+"""
+import glob
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import threading
+import urllib.request
+
+os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QProgressBar,
+                             QPushButton, QVBoxLayout)
+
+QSS = "/opt/astro-os/theme/astro.qss"
+sys.path.insert(0, "/opt/astro-os")
+try:
+    import palette
+    _recolour = palette.current().text
+except Exception:
+    _recolour = lambda s: s
+APPIMAGE = os.path.expanduser("~/.local/bin/wispr-flow")
+CONF = {"URL": "https://dl.wisprflow.ai/linux/latest", "PAGE": "https://wisprflow.ai/downloads"}
+try:
+    for line in open("/etc/astro-os/flow.conf"):
+        if "=" in line and not line.lstrip().startswith("#"):
+            k, v = line.strip().split("=", 1)
+            CONF[k] = v
+except OSError:
+    pass
+
+
+def installed():
+    """Command line that starts Wispr Flow, or None."""
+    for name in ("wispr-flow", "wisprflow", "WisprFlow"):
+        path = shutil.which(name)
+        if path:
+            return [path]
+    if os.access(APPIMAGE, os.X_OK):
+        return [APPIMAGE, "--appimage-extract-and-run"]
+    for d in ("/usr/share/applications", os.path.expanduser("~/.local/share/applications")):
+        for f in glob.glob(os.path.join(d, "*.desktop")):
+            base = os.path.basename(f).lower()
+            if "wispr" in base and not base.startswith("astro-"):
+                return ["gio", "launch", f]
+    return None
+
+
+def find_build():
+    """(url, kind) of a Linux build if the download link really serves one, else None."""
+    req = urllib.request.Request(CONF["URL"], headers={"User-Agent": "astro-os"})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        final = r.geturl().split("?")[0].lower()
+        ctype = r.headers.get("Content-Type", "").lower()
+        disp = r.headers.get("Content-Disposition", "").lower()
+    for kind in ("deb", "appimage"):
+        if final.endswith("." + kind) or ("." + kind) in disp:
+            return r.geturl(), kind
+    if "debian" in ctype:
+        return r.geturl(), "deb"
+    return None           # an HTML page: the link just bounces to the website, there is no build
+
+
+class Flow(QDialog):
+    found = pyqtSignal(object)
+    progress = pyqtSignal(int)
+    done = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("ASTRO//FLOW")
+        self.setMinimumWidth(560)
+        self.build = None
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(26, 22, 26, 20)
+        lay.setSpacing(14)
+        head = QLabel("WISPR FLOW")
+        head.setStyleSheet("font-size: 22px; font-weight: bold; color: #dcfff0; letter-spacing: 3px;")
+        self.msg = QLabel("Looking for a Linux build...")
+        self.msg.setWordWrap(True)
+        self.msg.setMinimumHeight(150)
+        self.msg.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.msg.setTextFormat(Qt.TextFormat.RichText)
+        self.bar = QProgressBar()
+        self.bar.setRange(0, 0)
+        row = QHBoxLayout()
+        self.act = QPushButton("INSTALL")
+        self.act.setDefault(True)
+        self.act.hide()
+        self.page = QPushButton("OPEN DOWNLOAD PAGE")
+        self.page.hide()
+        close = QPushButton("CLOSE")
+        row.addWidget(self.act)
+        row.addWidget(self.page)
+        row.addStretch(1)
+        row.addWidget(close)
+        for w in (head, self.msg, self.bar):
+            lay.addWidget(w)
+        lay.addLayout(row)
+        close.clicked.connect(self.reject)
+        self.page.clicked.connect(self.open_page)
+        self.act.clicked.connect(self.install)
+        self.found.connect(self.on_found)
+        self.progress.connect(self.on_progress)
+        self.done.connect(self.on_done)
+        threading.Thread(target=self.look, daemon=True).start()
+
+    # ------------------------------------------------------------ looking
+    def look(self):
+        try:
+            self.found.emit(find_build() or "none")
+        except Exception as e:                       # no network, DNS failure, timeout
+            self.found.emit("offline:" + str(e))
+
+    def on_found(self, res):
+        self.bar.hide()
+        if isinstance(res, tuple):
+            self.build = res
+            self.msg.setText("A Linux build of Wispr Flow is available. Install it now?")
+            self.act.show()
+        elif res == "none":
+            self.msg.setText(
+                "<b style='color:#ffbe3c'>Wispr Flow has no Linux version yet.</b><br><br>"
+                "Wispr currently ships Flow for Mac, Windows, iPhone and Android only. Their download page "
+                "has a <i>Vote to build for Linux</i> button.<br><br>"
+                "This button checks again every time you press it, and will offer a one-click install as "
+                "soon as a Linux build exists.")
+            self.page.show()
+        else:
+            self.msg.setText(
+                "<b style='color:#ff2bd6'>Could not reach wisprflow.ai.</b><br><br>"
+                "Check the network connection (ASTRO menu &gt; NETWORK / WI-FI) and press the button again.")
+
+    def open_page(self):
+        subprocess.Popen(["/opt/astro-os/astroctl", "launch", "web"] if not shutil.which("firefox")
+                         else ["firefox", CONF["PAGE"]], start_new_session=True)
+        self.accept()
+
+    # ------------------------------------------------------------ installing
+    def install(self):
+        self.act.setEnabled(False)
+        self.bar.setRange(0, 100)
+        self.bar.show()
+        self.msg.setText("Downloading Wispr Flow...")
+        threading.Thread(target=self.fetch, daemon=True).start()
+
+    def fetch(self):
+        url, kind = self.build
+        try:
+            tmp = tempfile.mkdtemp(prefix="flow-")
+            path = os.path.join(tmp, "wispr-flow." + kind)
+            req = urllib.request.Request(url, headers={"User-Agent": "astro-os"})
+            with urllib.request.urlopen(req, timeout=30) as r, open(path, "wb") as f:
+                total, got = int(r.headers.get("Content-Length") or 0), 0
+                while True:
+                    chunk = r.read(1 << 16)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    got += len(chunk)
+                    if total:
+                        self.progress.emit(int(got * 100 / total))
+            if kind == "deb":
+                os.chmod(tmp, 0o755)
+                # asks for the password in a dialog; apt pulls in whatever the package depends on
+                subprocess.run(["pkexec", "apt-get", "install", "-y", path], check=True)
+            else:
+                os.makedirs(os.path.dirname(APPIMAGE), exist_ok=True)
+                shutil.move(path, APPIMAGE)
+                os.chmod(APPIMAGE, 0o755)
+            self.done.emit("")
+        except Exception as e:
+            self.done.emit(str(e) or "failed")
+
+    def on_progress(self, pct):
+        self.bar.setValue(pct)
+
+    def on_done(self, err):
+        self.bar.hide()
+        if err:
+            self.msg.setText("<b style='color:#ff2bd6'>Install failed.</b><br><br>" + err)
+            self.act.setEnabled(True)
+            return
+        cmd = installed()
+        if cmd:
+            subprocess.Popen(cmd, start_new_session=True)
+            self.accept()
+        else:
+            self.msg.setText("Installed. Start it from the WISPR FLOW button.")
+            self.act.hide()
+
+
+def main():
+    cmd = installed()
+    if cmd and "--check" not in sys.argv:
+        os.execvp(cmd[0], cmd)
+    app = QApplication(sys.argv)
+    try:
+        app.setStyleSheet(_recolour(open(QSS).read()))
+    except OSError:
+        pass
+    Flow().exec()
+
+
+if __name__ == "__main__":
+    main()

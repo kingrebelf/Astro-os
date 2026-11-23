@@ -1,0 +1,33 @@
+---
+componentName: astro
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 940px,620px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+strings:
+  productName: "ASTRO//OS"
+  shortProductName: "ASTRO//OS"
+  version: "@VERSION@"
+  shortVersion: "@VERSION@"
+  versionedName: "ASTRO//OS @VERSION@"
+  shortVersionedName: "ASTRO//OS @VERSION@"
+  bootloaderEntryName: "ASTRO-OS"
+  productUrl: "https://github.com/kingrebelf/Astro-os"
+  supportUrl: "https://github.com/kingrebelf/Astro-os"
+  knownIssuesUrl: "https://github.com/kingrebelf/Astro-os/issues"
+  releaseNotesUrl: "https://github.com/kingrebelf/Astro-os"
+  donateUrl: ""
+images:
+  productLogo: "logo.png"
+  productIcon: "logo.png"
+  productWelcome: "welcome.png"
+slideshow: [ "slide.png" ]
+slideshowAPI: -1
+style:
+  SidebarBackground: "#010705"
+  SidebarText: "#2f8a62"
+  SidebarTextCurrent: "#00ff8c"
+  SidebarBackgroundCurrent: "#00331f"

@@ -1,0 +1,5 @@
+# ASTRO//OS terminal profile (your normal ~/.bashrc is loaded first)
+[ -f ~/.bashrc ] && . ~/.bashrc
+_g='\[\e[38;2;0;255;140m\]'; _c='\[\e[38;2;0;229;255m\]'; _d='\[\e[38;2;31;115;80m\]'; _m='\[\e[38;2;255;43;214m\]'; _r='\[\e[0m\]'
+PS1="${_d}┌─[${_c}\u${_d}@${_g}\h${_d}]─[${_g}\w${_d}]\$( s=\$?; [ \$s -ne 0 ] && printf '─[\[\e[38;2;255;43;214m\]%s\[\e[38;2;31;115;80m\]]' \$s )\n${_d}└─${_g}▶ ${_r}"
+"$(dirname "${BASH_SOURCE[0]}")/banner.sh"

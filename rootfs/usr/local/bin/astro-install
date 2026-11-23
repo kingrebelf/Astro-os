@@ -1,0 +1,4 @@
+#!/bin/bash
+# INSTALL TO DISK: start the installer from the live session.
+if [ ! -d /run/live/medium ]; then echo "This system is already installed."; exit 1; fi
+exec sudo -E env QT_QPA_PLATFORMTHEME= QT_STYLE_OVERRIDE=Fusion calamares "$@"

@@ -1,0 +1,8 @@
+#!/bin/bash
+# 'opencode' on ASTRO//OS: run this user's copy, installing it first if it is not there yet.
+bin="$HOME/.opencode/bin/opencode"
+if [ ! -x "$bin" ]; then
+  echo "OpenCode is not installed for $USER yet. Installing it now."
+  /usr/local/bin/astro-opencode-install || exit 1
+fi
+exec "$bin" "$@"

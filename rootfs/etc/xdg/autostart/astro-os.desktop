@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=ASTRO//OS shell
+Exec=/opt/astro-os/astroctl autostart
+Terminal=false
+NoDisplay=true

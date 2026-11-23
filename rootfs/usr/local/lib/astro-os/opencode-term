@@ -1,0 +1,5 @@
+#!/bin/bash
+# Runs inside the terminal the OPENCODE button opens.
+if ! /usr/local/bin/opencode "$@"; then
+  echo; read -n1 -rsp "Press any key to close."
+fi

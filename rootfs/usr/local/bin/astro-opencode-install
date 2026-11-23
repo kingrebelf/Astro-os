@@ -1,0 +1,24 @@
+#!/bin/bash
+# Install or update the OpenCode CLI (https://opencode.ai) for this user.
+# It goes to ~/.opencode/bin, the same place OpenCode's own installer uses, so 'opencode upgrade' keeps working.
+#   OPENCODE_VARIANT=linux-x64-baseline   force the build for CPUs without AVX2
+set -Eeuo pipefail
+g=$'\e[38;2;0;255;140m'; m=$'\e[38;2;255;43;214m'; r=$'\e[0m'
+dest="$HOME/.opencode/bin"
+variant="${OPENCODE_VARIANT:-}"
+if [ -z "$variant" ]; then
+  variant=linux-x64
+  grep -qw avx2 /proc/cpuinfo || variant=linux-x64-baseline
+fi
+url="https://opencode.ai/update/api/latest/cli/opencode/opencode-$variant.tar.gz"
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+echo "${g}==>${r} Downloading OpenCode ($variant)"
+if ! curl -fL --progress-bar -o "$tmp/opencode.tar.gz" "$url"; then
+  echo "${m}xx${r}  Download failed. Check the network connection (ASTRO menu > NETWORK / WI-FI) and try again." >&2
+  exit 1
+fi
+tar -xzf "$tmp/opencode.tar.gz" -C "$tmp" opencode
+mkdir -p "$dest"
+install -m 755 "$tmp/opencode" "$dest/opencode.new"
+mv -f "$dest/opencode.new" "$dest/opencode"
+echo "${g}==>${r} Installed OpenCode $("$dest/opencode" --version 2>/dev/null | head -1) in $dest"

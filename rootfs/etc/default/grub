@@ -1,0 +1,6 @@
+# ASTRO//OS boot menu settings. Run 'sudo update-grub' after changing anything here.
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=1
+GRUB_DISTRIBUTOR="ASTRO//OS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3"
+GRUB_CMDLINE_LINUX=""

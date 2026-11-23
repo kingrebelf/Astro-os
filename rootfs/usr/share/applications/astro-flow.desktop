@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Wispr Flow
+Comment=Voice dictation
+Exec=astro-flow
+Icon=utilities-terminal
+Terminal=false
+Categories=Utility;

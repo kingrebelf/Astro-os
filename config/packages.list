@@ -1,0 +1,114 @@
+# ASTRO//OS package set. One name per line; '#' starts a comment.
+# Everything is installed with --no-install-recommends, so nothing rides along uninvited.
+
+# --- boot, kernel, live medium
+linux-image-amd64
+systemd-sysv
+systemd-timesyncd
+dbus
+dbus-user-session
+initramfs-tools
+zstd
+live-boot
+live-config
+live-config-systemd
+user-setup
+sudo
+locales
+console-setup
+keyboard-configuration
+kbd
+
+# --- bootloader pieces (used to build the ISO and by the installer; BIOS + UEFI + Secure Boot)
+grub-common
+grub2-common
+grub-pc-bin
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+shim-signed
+efibootmgr
+os-prober
+
+# --- hardware support: wired/wifi/graphics firmware and CPU microcode
+firmware-linux-free
+firmware-misc-nonfree
+firmware-amd-graphics
+firmware-intel-graphics
+firmware-intel-misc
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-mediatek
+firmware-bnx2
+firmware-bnx2x
+firmware-sof-signed
+intel-microcode
+amd64-microcode
+
+# --- network
+network-manager
+wpasupplicant
+iproute2
+iputils-ping
+curl
+ca-certificates
+openssh-client
+
+# --- display stack (X11, no compositor)
+xserver-xorg
+xserver-xorg-video-all
+xserver-xorg-input-libinput
+x11-xserver-utils
+x11-utils
+x11-apps
+lightdm
+lightdm-gtk-greeter
+openbox
+lxqt-session
+lxqt-config
+lxqt-qtplugin
+lxqt-policykit
+polkitd
+pkexec
+xdg-utils
+xdg-user-dirs
+
+# --- sound (the voice panel and dictation apps need a working microphone)
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+
+# --- ASTRO//OS shell
+python3
+python3-pyqt6
+alacritty
+fonts-ubuntu
+fonts-noto-cjk
+fonts-dejavu-core
+papirus-icon-theme
+libglib2.0-bin
+libxtst6
+libxext6
+pciutils
+usbutils
+
+# --- the apps: browser, editor (GUI + terminal), and what OpenCode expects
+firefox-esr
+featherpad
+nano
+git
+unzip
+less
+bash-completion
+procps
+psmisc
+
+# --- installer
+calamares
+rsync
+squashfs-tools
+dosfstools
+e2fsprogs
+parted

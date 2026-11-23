@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=OpenCode
+Comment=AI coding agent
+Exec=astro-opencode
+Icon=utilities-terminal
+Terminal=false
+Categories=Utility;
