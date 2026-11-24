@@ -33,6 +33,29 @@ def write(path, text, mode=None):
         os.chmod(path, mode)
 
 
+def ini_set(path, section, values):
+    """Set keys in one section of a Qt-style .ini file, keeping everything else the program saved there."""
+    try:
+        lines = open(path).read().splitlines()
+    except OSError:
+        lines = []
+    out, inside, left = [], False, dict(values)
+    for line in lines + ["[]"]:
+        if line.startswith("["):
+            if inside:
+                out += ["%s=%s" % kv for kv in left.items()]
+                left = {}
+            inside = line.strip() == "[%s]" % section
+        elif inside and line.split("=", 1)[0] in left:
+            key = line.split("=", 1)[0]
+            line = "%s=%s" % (key, left.pop(key))
+        out.append(line)
+    out.pop()
+    if left:
+        out += ["", "[%s]" % section] + ["%s=%s" % kv for kv in left.items()]
+    write(path, "\n".join(out).lstrip("\n") + "\n")
+
+
 def main():
     if "--reset" in sys.argv:
         try:
@@ -65,6 +88,10 @@ def main():
     if pal.light:
         lxqt = lxqt.replace("icon_theme=Papirus-Dark", "icon_theme=Papirus-Light")
     write(os.path.join(HOME, ".config", "lxqt", "lxqt.conf"), lxqt)
+
+    # FeatherPad paints its text area itself: switch its own dark scheme to match the theme
+    ini_set(os.path.join(HOME, ".config", "featherpad", "fp.conf"), "text",
+            {"darkColorScheme": "false" if pal.light else "true", "darkBgColorValue": "10"})
 
     # cursor + window borders. On the distro the default look is already in /usr/share,
     # so a per-user copy is only needed (and only kept) for a custom theme.

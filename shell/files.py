@@ -26,6 +26,18 @@ KIND_COLOR = {"dir": CYAN, "code": GREEN, "image": MAGENTA, "archive": AMBER, "m
               "exec": WHITE, "file": tc(120, 200, 160), "link": CYAN}
 
 
+def looks_like_text(path):
+    """True for a known text extension, or a small file with no NUL bytes in its first 8 KB."""
+    if os.path.splitext(path)[1].lower() in CODE:
+        return True
+    try:
+        with open(path, "rb") as f:
+            head = f.read(8192)
+    except OSError:
+        return False
+    return b"\0" not in head
+
+
 def kind_of(name, mode, is_dir):
     if is_dir:
         return "dir"
@@ -363,6 +375,7 @@ class Info(QWidget):
 class Files(QWidget):
     loaded = pyqtSignal(str, list, str)
     job_done = pyqtSignal(str)
+    opened = pyqtSignal(str)
 
     def __init__(self, start):
         super().__init__()
@@ -459,6 +472,7 @@ class Files(QWidget):
         self.table.contextRequested.connect(self.context)
         self.loaded.connect(self.on_loaded)
         self.job_done.connect(self.on_job)
+        self.opened.connect(self.say)
         for seq, fn in (("F5", self.reload), ("F2", self.rename), ("Delete", self.delete), ("Ctrl+C", lambda: self.set_clip("copy")),
                         ("Ctrl+X", lambda: self.set_clip("cut")), ("Ctrl+V", self.paste), ("Ctrl+H", self.toggle_hidden),
                         ("Ctrl+L", self.edit_path), ("Alt+Left", self.go_back), ("Alt+Right", self.go_fwd),
@@ -609,9 +623,29 @@ class Files(QWidget):
         if r["dir"]:
             self.navigate(r["path"])
         else:
-            subprocess.Popen(["xdg-open", r["path"]], start_new_session=True,
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             self.say("OPENING " + r["name"].upper())
+            threading.Thread(target=self.launch, args=(r["path"], r["name"]), daemon=True).start()
+
+    def launch(self, path, name):
+        """Open a file with its default app. If the system has none, text goes to the editor."""
+        for cmd in (["xdg-open", path], ["gio", "open", path]):
+            try:
+                p = subprocess.Popen(cmd, start_new_session=True,
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if p.wait(timeout=8) == 0:
+                    return
+            except subprocess.TimeoutExpired:
+                return                      # still running: the app took over and is open
+            except OSError:
+                pass
+        if looks_like_text(path):
+            self.edit_file(path)
+        else:
+            self.opened.emit("NO APP CAN OPEN " + name.upper() + " // RIGHT-CLICK > OPEN IN TEXT EDITOR")
+
+    def edit_file(self, path):
+        subprocess.Popen([os.path.join(ROOT, "astroctl"), "launch", "edit", path], start_new_session=True,
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def keyPressEvent(self, e):
         k = e.key()
@@ -778,6 +812,8 @@ class Files(QWidget):
         rows = self.table.selected_rows()
         if rows:
             m.addAction("OPEN", lambda: self.open_item(rows[0]["id"]))
+            if not rows[0]["dir"]:
+                m.addAction("OPEN IN TEXT EDITOR", lambda: self.edit_file(rows[0]["path"]))
             m.addAction("RENAME", self.rename)
             m.addAction("COPY", lambda: self.set_clip("copy"))
             m.addAction("CUT", lambda: self.set_clip("cut"))

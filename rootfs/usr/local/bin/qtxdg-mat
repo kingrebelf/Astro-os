@@ -1,0 +1,36 @@
+#!/bin/sh
+# Stand-in for LXQt's qtxdg-mat, which Debian does not ship.
+#
+# In an LXQt session xdg-open, xdg-mime and xdg-settings hand every request to
+# qtxdg-mat and fail when it is missing, so double-clicking a file opened
+# nothing. This answers the same commands with GLib's gio, which reads the same
+# default-app lists (/etc/xdg/mimeapps.list, ~/.config/mimeapps.list).
+export LC_ALL=C.UTF-8
+cmd=$1
+[ $# -gt 0 ] && shift
+
+case "$cmd" in
+  open|mimetype|defapp|def-web-browser|def-email-client) ;;
+  *) echo "qtxdg-mat (ASTRO//OS stand-in): open | mimetype | defapp | def-web-browser | def-email-client" >&2
+     exit 1 ;;
+esac
+for a in "$@"; do [ "$a" = --help ] && exit 0; done     # xdg-utils probes "qtxdg-mat <cmd> --help"
+
+default_for() {     # print the default .desktop for a MIME type, fail if there is none
+  out=$(gio mime "$1" 2>/dev/null | sed -n '1{/^Default application/s/.*: //p}')
+  [ -n "$out" ] && echo "$out"
+}
+
+case "$cmd" in
+  open)
+    [ $# -ge 1 ] || exit 1
+    exec gio open "$@" ;;
+  mimetype)
+    gio info -a standard::content-type "$1" 2>/dev/null | sed -n 's/^ *standard::content-type: //p' | grep . ;;
+  defapp)
+    if [ "$1" = --set ]; then gio mime "$3" "$2" >/dev/null; else default_for "$1"; fi ;;
+  def-web-browser)
+    default_for x-scheme-handler/http ;;
+  def-email-client)
+    default_for x-scheme-handler/mailto ;;
+esac

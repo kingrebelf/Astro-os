@@ -15,6 +15,7 @@ USB stick and install on any 64-bit PC or server (old BIOS machines, UEFI, and U
 | Files | ASTRO//FILES (`Super+E`) |
 | Browser | Firefox ESR with the ASTRO styling (`Super+B`) |
 | Editor | FeatherPad (ASTRO menu > TEXT EDITOR), and `nano` in the terminal |
+| Opening files | Double-click in ASTRO//FILES: text and code open in the editor, web pages, PDFs, pictures and media in Firefox. Defaults in `/etc/xdg/mimeapps.list` |
 | Settings | LXQt settings (ASTRO menu > SYSTEM SETTINGS), `nmtui` for network and Wi-Fi |
 | Themes | ASTRO menu > APPEARANCE / THEMES: presets, accent colours, light mode, rounding, fonts |
 | OpenCode | Built into the image. `{} CODE` in the dock, `Super+C`, or `opencode` in a terminal |
@@ -79,6 +80,7 @@ removes itself and the live-USB machinery from the installed system.
 | `hooks/` | Scripts run inside the system while it is built |
 | `calamares/` | Installer settings and branding |
 | `test/vm.sh` | Boots the ISO in QEMU for testing |
+| `fixes/` | Scripts that patch an already-installed machine without reinstalling |
 
 Changes made to `shell/` compared with the Astro-os repo: `corners.py` (rounded corners), `palette.py`,
 `appearance.py` and `theme/apply.py` (themes), rounded dock buttons, a distro mode in
@@ -101,6 +103,15 @@ the original look. Put a `theme.json` in `/etc/astro-os/` to change the default 
 
 How it works: `shell/palette.py` moves each colour of the original green look to the matching place in
 the chosen palette, so no screen had to be redrawn by hand. With the default theme it changes nothing.
+
+## Fixing an installed machine
+
+Fixes that matter to machines already installed ship as scripts in `fixes/`. For example, 0.2.0 could not
+open files by double-clicking them; on a 0.2.0 machine with internet:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kingrebelf/Astro-os/linux-iso/fixes/0.2.1-open-files.sh | sudo sh
+```
 
 ## Rounded corners
 
